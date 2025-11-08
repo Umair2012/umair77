@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Comprehensive single-page interactive HTML program about AI, AGI, ML, ethics, history, and hands-on demos." />
+  <title>AI & AGI Explorer — A Big Interactive Program</title>
+
+  <style>
+    :root{
+      --bg:#0b1021;
+      --panel:#12183a;
+      --panel-2:#0f1530;
+      --text:#e8ecf8;
+      --muted:#b8c0dd;
+      --accent:#6cf0ff;
+      --accent-2:#ff9d6c;
+      --good:#50d37d;
+      --warn:#ffd86c;
+      --bad:#ff6c7a;
+      --code-bg:#0b1430;
+      --border:#243065;
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      margin:0; padding:0; background:var(--bg); color:var(--text); font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    }
+
+    a{ color:var(--accent); text-decoration:none; }
+    a:hover{ text-decoration:underline; }
+
+    header{
+      position:sticky; top:0; z-index:999;
+      background:linear-gradient(180deg, rgba(18,24,58,0.95), rgba(18,24,58,0.80));
+      backdrop-filter: blur(8px);
+      border-bottom:1px solid var(--border);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 20px; max-width:1200px; margin:0 auto;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:700;
+    }
+    .brand .logo{
+      width:28px; height:28px; border-radius:50%;
+      background:radial-gradient(circle at 30% 30%, var(--accent) 0%, var(--accent-2) 40%, transparent 60%), linear-gradient(45deg, var(--accent), var(--accent-2));
+      box-shadow:0 0 16px rgba(108,240,255,0.5), inset 0 0 12px rgba(255,157,108,0.4);
+    }
+
+    .toc{
+      display:flex; flex-wrap:wrap; gap:10px;
+    }
+    .toc a{
+      padding:6px 10px; border:1px solid var(--border); border-radius:10px; background:var(--panel-2);
+      font-size:14px;
+    }
+
+    .hero{
+      max-width:1200px; margin:24px auto 0 auto; padding:24px 20px;
+      display:grid; grid-template-columns:1.2fr 1fr; gap:20px;
+    }
+    .hero h1{ margin:0 0 10px; font-size:36px; line-height:1.15; }
+    .hero p{ margin:0 0 12px; color:var(--muted); font-size:16px; }
+    .cta-row{ display:flex; gap:12px; margin-top:14px; flex-wrap:wrap; }
+    .btn{
+      padding:10px 14px; border-radius:10px; border:1px solid var(--border);
+      background:linear-gradient(180deg, var(--panel), var(--panel-2));
+      color:var(--text); cursor:pointer; font-weight:600;
+    }
+    .btn.primary{ background:linear-gradient(180deg, #1b2760, #162051); border-color:#33418a; }
+    .btn:hover{ filter:brightness(1.1); }
+
+    .panel{
+      background:linear-gradient(180deg, var(--panel), var(--panel-2));
+      border:1px solid var(--border); border-radius:14px; padding:16px;
+      box-shadow:0 10px 20px rgba(0,0,0,0.25);
+    }
+
+    main{ max-width:1200px; margin:0 auto; padding:20px; }
+    section{ margin:24px 0; }
+    section h2{
+      margin:0 0 10px; font-size:28px; border-bottom:1px dashed var(--border); padding-bottom:6px;
+    }
+    section h3{ margin:16px 0 8px; font-size:20px; }
+    .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .grid-3{ display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
+
+    .card{
+      border:1px solid var(--border); border-radius:12px; padding:14px; background:var(--panel-2);
+    }
+    .badge{
+      display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid var(--border);
+      font-size:12px; color:var(--muted); margin-right:6px;
+    }
+    .muted{ color:var(--muted); }
+    .code{
+      background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:12px; overflow:auto; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    .timeline{ position:relative; padding-left:24px; }
+    .timeline::before{
+      content:""; position:absolute; left:10px; top:0; bottom:0; width:2px; background:linear-gradient(180deg, var(--accent), transparent);
+    }
+    .time-item{
+      position:relative; margin:12px 0; padding-left:12px;
+    }
+    .time-item::before{
+      content:""; position:absolute; left:-4px; top:6px; width:10px; height:10px; border-radius:50%; background:var(--accent-2); box-shadow:0 0 10px var(--accent-2);
+    }
+
+    .quiz{
+      display:grid; grid-template-columns:1fr; gap:16px;
+    }
+    .option{
+      display:flex; align-items:flex-start; gap:10px;
+      border:1px solid var(--border); background:var(--panel-2); padding:12px; border-radius:10px; cursor:pointer;
+    }
+    .option.correct{ border-color:rgba(80, 211, 125, 0.8); }
+    .option.wrong{ border-color:rgba(255, 108, 122, 0.8); }
+    .result{ font-weight:700; margin-top:8px; }
+
+    .sim-wrap{ display:grid; grid-template-columns:1.1fr 1fr; gap:16px; }
+    canvas{ background:#0a122b; border:1px solid var(--border); border-radius:8px; }
+    input[type="range"]{ width:100%; }
+
+    .footer{
+      margin-top:40px; padding:20px; border-top:1px solid var(--border); color:var(--muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .hero{ grid-template-columns:1fr; }
+      .grid-2{ grid-template-columns:1fr; }
+      .grid-3{ grid-template-columns:1fr; }
+      .sim-wrap{ grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>AI & AGI Explorer</div>
+      </div>
+      <nav class="toc">
+        <a href="#intro">Intro</a>
+        <a href="#definitions">Definitions</a>
+        <a href="#history">History</a>
+        <a href="#ml-concepts">ML concepts</a>
+        <a href="#demo">Hands-on demo</a>
+        <a href="#ethics">Ethics</a>
+        <a href="#applications">Applications</a>
+        <a href="#systems">Systems & scaling</a>
+        <a href="#future">Future & AGI</a>
+        <a href="#quiz">Quiz</a>
+        <a href="#glossary">Glossary</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="panel">
+      <h1>Explore Artificial Intelligence, AGI, and everything in between</h1>
+      <p class="muted">A single, big interactive page covering fundamentals, history, key ideas, demos, ethics, and future directions. Tinker, learn, and form your own point of view.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#demo">Try the live demo</a>
+        <a class="btn" href="#quiz">Test yourself</a>
+        <a class="btn" href="#glossary">Browse glossary</a>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Quick map</h3>
+      <ul>
+        <li><span class="badge">Start</span>Intro + Definitions</li>
+        <li><span class="badge">Context</span>History & Timeline</li>
+        <li><span class="badge">Core</span>ML concepts & Systems</li>
+        <li><span class="badge">Hands-on</span>Gradient demo & Bias visual</li>
+        <li><span class="badge">Reflect</span>Ethics & Societal impact</li>
+        <li><span class="badge">Stretch</span>AGI & Future thinking</li>
+      </ul>
+    </div>
+  </div>
+
+  <main>
+    <section id="intro">
+      <h2>Introduction to AI</h2>
+      <div class="grid-2">
+        <div class="card">
+          <p><strong>What</strong>: Artificial Intelligence (AI) is a field focused on building systems that perform tasks requiring human-like intelligence—perception, reasoning, learning, communication, and action.</p>
+          <p><strong>Why it matters</strong>: AI augments human capabilities, automates repetitive work, and opens new frontiers in science, medicine, finance, and creativity.</p>
+          <p><strong>How it works (high level)</strong>: Data + objectives + algorithms + compute → models that learn patterns and make decisions or predictions.</p>
+        </div>
+        <div class="card">
+          <p><strong>Types of AI</strong>:</p>
+          <ul>
+            <li><strong>Narrow AI</strong>: Specialized systems (e.g., language models, recommendation engines).</li>
+            <li><strong>Broad AI</strong>: Multi-capability systems, still task-bound.</li>
+            <li><strong>AGI (aspirational)</strong>: General intelligence across domains with robust transfer, autonomy, and reliability.</li>
+          </ul>
+          <p class="muted">AGI is not a single metric—think capability breadth, adaptability, and alignment with human values.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="definitions">
+      <h2>Definitions and mental models</h2>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Intelligence</h3>
+          <p><strong>Working view</strong>: The ability to achieve goals across diverse environments using learning, reasoning, and adaptation.</p>
+          <p><strong>Dimensions</strong>: Perception, prediction, planning, abstraction, transfer, and calibration.</p>
+        </div>
+        <div class="card">
+          <h3>Learning</h3>
+          <p><strong>Supervised</strong>: Learn from labeled examples.</p>
+          <p><strong>Unsupervised</strong>: Discover structure (clusters, latent features).</p>
+          <p><strong>Reinforcement</strong>: Optimize actions via rewards in sequential decision-making.</p>
+        </div>
+        <div class="card">
+          <h3>Alignment</h3>
+          <p><strong>Goal</strong>: Ensure AI objectives and behaviors stay reliably beneficial for humans.</p>
+          <p><strong>Focus</strong>: Safety, transparency, oversight, and harm minimization.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="history">
+      <h2>History and timeline</h2>
+      <div class="panel timeline">
+        <div class="time-item">
+          <strong>1950s</strong> — Early ideas, Turing Test, symbolic AI.
+          <div class="muted">Rule-based systems and logic programming.</div>
+        </div>
+        <div class="time-item">
+          <strong>1980s–1990s</strong> — Expert systems, probabilistic models.
+          <div class="muted">Bayesian networks, decision trees, SVMs.</div>
+        </div>
+        <div class="time-item">
+          <strong>2010s</strong> — Deep learning explosion.
+          <div class="muted">ConvNets, sequence models, transformers, large-scale training.</div>
+        </div>
+        <div class="time-item">
+          <strong>2020s</strong> — Foundation models & multi-modal systems.
+          <div class="muted">Text, images, audio, code; emergent tooling, scaling laws.</div>
+        </div>
+      </div>
+      <div class="card">
+        <p><strong>Pattern</strong>: Progress accelerates with data, compute, algorithmic innovations, and better evaluation/feedback loops.</p>
+      </div>
+    </section>
+
+    <section id="ml-concepts">
+      <h2>Core machine learning concepts</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Bias-variance & generalization</h3>
+          <p><strong>Bias</strong>: Systematic error from simplifying assumptions. <strong>Variance</strong>: Sensitivity to data noise. <strong>Generalization</strong>: Performance on unseen data.</p>
+          <p><strong>Regularization</strong>: Techniques to avoid overfitting (weight decay, dropout, early stopping).</p>
+        </div>
+        <div class="card">
+          <h3>Optimization</h3>
+          <p><strong>Gradient descent</strong>: Iteratively adjust parameters to minimize loss.</p>
+          <p><strong>Loss functions</strong>: MSE (regression), cross-entropy (classification), margin losses, etc.</p>
+          <p><strong>Learning rate</strong>: Step size—too high diverges, too low stalls.</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Representations</h3>
+          <p><strong>Features</strong>: Transform raw inputs into informative dimensions.</p>
+          <p><strong>Embeddings</strong>: Dense vectors capturing semantic relationships (words, images, items).</p>
+        </div>
+        <div class="card">
+          <h3>Evaluation</h3>
+          <p><strong>Metrics</strong>: Accuracy, precision/recall, F1, ROC-AUC, perplexity.</p>
+          <p><strong>Robustness</strong>: Distribution shift, adversarial examples, calibration.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="demo">
+      <h2>Hands-on: gradient descent and decision boundary</h2>
+      <div class="panel sim-wrap">
+        <div>
+          <h3>Interactive linear regression</h3>
+          <p class="muted">Adjust the learning rate and noise. Watch the line fit synthetic data via gradient descent.</p>
+          <div class="card">
+            <label><strong>Learning rate</strong></label>
+            <input id="lr" type="range" min="0.001" max="0.2" step="0.001" value="0.05" />
+            <div class="muted">Lower = stable, Higher = faster but risk of divergence</div>
+            <label><strong>Noise</strong></label>
+            <input id="noise" type="range" min="0" max="0.8" step="0.01" value="0.2" />
+            <div class="muted">Simulated observation noise</div>
+            <div class="cta-row">
+              <button class="btn primary" id="regen">Regenerate data</button>
+              <button class="btn" id="step">Step 50 iters</button>
+              <button class="btn" id="reset">Reset model</button>
+            </div>
+          </div>
+          <canvas id="regCanvas" width="600" height="360" aria-label="Linear regression canvas"></canvas>
+          <div class="card">
+            <p><strong>Loss</strong>: Mean squared error. <strong>Model</strong>: y = w x + b. <strong>Update</strong>: w ← w − α ∂L/∂w, b ← b − α ∂L/∂b.</p>
+            <p class="muted">Observe convergence, oscillation at high learning rates, and impact of noise.</p>
+          </div>
+        </div>
+
+        <div>
+          <h3>Visualizing a simple classifier</h3>
+          <p class="muted">A logistic classifier separating two clusters. Drag the decision boundary angle to change classification.</p>
+          <div class="card">
+            <label><strong>Boundary angle</strong></label>
+            <input id="angle" type="range" min="-90" max="90" step="1" value="20" />
+            <div class="muted">Rotate the linear separator</div>
+          </div>
+          <canvas id="clsCanvas" width="450" height="360" aria-label="Classifier canvas"></canvas>
+          <div class="card">
+            <p><strong>Intuition</strong>: The classifier assigns probabilities via a sigmoid of a linear score. The threshold defines the split.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="ethics">
+      <h2>Ethics, safety, and responsible AI</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Key themes</h3>
+          <ul>
+            <li><strong>Fairness</strong>: Avoid discriminatory outcomes; measure and mitigate biases.</li>
+            <li><strong>Privacy</strong>: Respect data rights and minimize unnecessary collection.</li>
+            <li><strong>Transparency</strong>: Explainable decisions and clear documentation.</li>
+            <li><strong>Accountability</strong>: Human oversight, audit trails, and governance.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Practical steps</h3>
+          <ul>
+            <li><strong>Data audits</strong>: Check representation, quality, and consent.</li>
+            <li><strong>Risk reviews</strong>: Scenario analysis, red-teaming, failure modes.</li>
+            <li><strong>Monitoring</strong>: Drift detection, feedback channels, rollback plans.</li>
+            <li><strong>Inclusion</strong>: Multistakeholder input and accessible design.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="applications">
+      <h2>Applications across domains</h2>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Healthcare</h3>
+          <p><strong>Use cases</strong>: Imaging, triage support, drug discovery, operations optimization.</p>
+          <p class="muted">Focus on safety, validation, and clinician-in-the-loop.</p>
+        </div>
+        <div class="card">
+          <h3>Finance</h3>
+          <p><strong>Use cases</strong>: Fraud detection, credit scoring, AML, risk modeling, personalization.</p>
+          <p class="muted">Compliance and explainability are core.</p>
+        </div>
+        <div class="card">
+          <h3>Public sector</h3>
+          <p><strong>Use cases</strong>: Citizen services, logistics, urban planning, disaster response.</p>
+          <p class="muted">Equity and accountability matter.</p>
+        </div>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Retail & E‑commerce</h3>
+          <p><strong>Use cases</strong>: Search, recommendations, inventory, pricing, chat support.</p>
+        </div>
+        <div class="card">
+          <h3>Manufacturing</h3>
+          <p><strong>Use cases</strong>: Predictive maintenance, quality inspection, robotics.</p>
+        </div>
+        <div class="card">
+          <h3>Education</h3>
+          <p><strong>Use cases</strong>: Personalized learning, assessment support, content creation.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="systems">
+      <h2>Systems, scaling, and deployment</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Data pipelines</h3>
+          <p><strong>Ingest</strong>: ETL/ELT, streaming, batch.</p>
+          <p><strong>Manage</strong>: Versioning, lineage, quality checks.</p>
+          <p><strong>Feature stores</strong>: Consistent online/offline features.</p>
+        </div>
+        <div class="card">
+          <h3>Training & inference</h3>
+          <p><strong>Training</strong>: Distributed compute, checkpoints, hyperparameter search.</p>
+          <p><strong>Inference</strong>: Latency, throughput, caching, quantization.</p>
+          <p><strong>Ops</strong>: CI/CD, canary deploys, observability.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Evaluation loops</h3>
+        <p><strong>Pre-deploy</strong>: Benchmarks, adversarial testing, domain-specific metrics.</p>
+        <p><strong>Post-deploy</strong>: Real-world feedback, drift alerts, human-in-the-loop escalation.</p>
+      </div>
+    </section>
+
+    <section id="future">
+      <h2>Future thinking and AGI</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>What would AGI imply?</h3>
+          <p><strong>Breadth</strong>: Competence across diverse tasks with minimal fine-tuning.</p>
+          <p><strong>Autonomy</strong>: Goal formation, planning, and reliable execution.</p>
+          <p><strong>Alignment</strong>: Robust safety guarantees under shifting contexts.</p>
+        </div>
+        <div class="card">
+          <h3>Shaping trajectories</h3>
+          <p><strong>Governance</strong>: Standards, audits, international coordination.</p>
+          <p><strong>Research</strong>: Safety, interpretability, robustness, value learning.</p>
+          <p><strong>Society</strong>: Education, workforce transition, inclusive prosperity.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="quiz">
+      <h2>Quiz: check your understanding</h2>
+      <div class="panel quiz" aria-live="polite">
+        <div>
+          <strong>Q1:</strong> Which statement best describes generalization?
+          <div class="option" data-q="1" data-a="A"><strong>A:</strong> Performance on unseen data.</div>
+          <div class="option" data-q="1" data-a="B"><strong>B:</strong> Maximum training accuracy.</div>
+          <div class="option" data-q="1" data-a="C"><strong>C:</strong> Using more parameters.</div>
+        </div>
+        <div>
+          <strong>Q2:</strong> What does learning rate control in gradient descent?
+          <div class="option" data-q="2" data-a="A"><strong>A:</strong> Size of each parameter update.</div>
+          <div class="option" data-q="2" data-a="B"><strong>B:</strong> Number of classes.</div>
+          <div class="option" data-q="2" data-a="C"><strong>C:</strong> Input dimensionality.</div>
+        </div>
+        <div>
+          <strong>Q3:</strong> Which is a fairness practice?
+          <div class="option" data-q="3" data-a="A"><strong>A:</strong> Data audits and bias mitigation.</div>
+          <div class="option" data-q="3" data-a="B"><strong>B:</strong> Ignoring minority groups.</div>
+          <div class="option" data-q="3" data-a="C"><strong>C:</strong> Maximizing only accuracy.</div>
+        </div>
+        <button class="btn primary" id="submitQuiz">Submit quiz</button>
+        <div id="quizResult" class="result"></div>
+      </div>
+    </section>
+
+    <section id="glossary">
+      <h2>Glossary</h2>
+      <div class="grid-3">
+        <div class="card">
+          <p><strong>Embedding</strong>: A dense vector representing semantic attributes of an entity.</p>
+          <p><strong>Overfitting</strong>: Memorizing training data patterns that don’t generalize.</p>
+          <p><strong>Regularization</strong>: Techniques that penalize complexity to improve generalization.</p>
+        </div>
+        <div class="card">
+          <p><strong>Transformer</strong>: A neural architecture using attention for sequence modeling.</p>
+          <p><strong>Attention</strong>: Mechanism that weights input parts by relevance.</p>
+          <p><strong>Perplexity</strong>: Measure of predictive uncertainty in language modeling.</p>
+        </div>
+        <div class="card">
+          <p><strong>Explainability</strong>: Making model decisions interpretable to humans.</p>
+          <p><strong>Drift</strong>: Change in data distribution degrading performance.</p>
+          <p><strong>Reinforcement learning</strong>: Learning by trial-and-error with rewards.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="resources">
+      <h2>Learn more and keep exploring</h2>
+      <div class="panel">
+        <ul>
+          <li><strong>Practice</strong>: Implement small models, visualize metrics, and iterate.</li>
+          <li><strong>Read</strong>: Papers, blogs, textbooks; compare ideas across sources.</li>
+          <li><strong>Discuss</strong>: Join communities; share experiments and insights.</li>
+          <li><strong>Reflect</strong>: Consider ethics and social impact alongside performance.</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="footer">
+      <div>© 2025 AI & AGI Explorer · Built as a single-file HTML learning program.</div>
+    </div>
+  </main>
+
+  <script>
+    // Utility: random with seedless noise
+    const rand = (min, max) => Math.random() * (max - min) + min;
+
+    // --- Linear Regression Demo ---
+    const regCanvas = document.getElementById('regCanvas');
+    const rctx = regCanvas.getContext('2d');
+    const lrEl = document.getElementById('lr');
+    const noiseEl = document.getElementById('noise');
+    const regenBtn = document.getElementById('regen');
+    const stepBtn = document.getElementById('step');
+    const resetBtn = document.getElementById('reset');
+
+    let data = [];
+    let w = rand(-1, 1), b = rand(-0.5, 0.5);
+    let trueW = 1.2, trueB = -0.6;
+
+    function genData(){
+      data = [];
+      const noise = parseFloat(noiseEl.value);
+      for(let i=0;i<120;i++){
+        const x = rand(-3, 3);
+        const y = trueW * x + trueB + rand(-noise, noise);
+        data.push({x,y});
+      }
+    }
+
+    function drawReg(){
+      rctx.clearRect(0,0,regCanvas.width, regCanvas.height);
+      // Axes
+      rctx.strokeStyle = '#2b3b8a';
+      rctx.lineWidth = 1;
+      rctx.beginPath();
+      rctx.moveTo(40, regCanvas.height-40); rctx.lineTo(regCanvas.width-20, regCanvas.height-40);
+      rctx.moveTo(40, regCanvas.height-40); rctx.lineTo(40, 20);
+      rctx.stroke();
+
+      // Scale
+      const sx = x => 40 + (x + 3) / 6 * (regCanvas.width - 60);
+      const sy = y => (regCanvas.height-40) - (y + 3) / 6 * (regCanvas.height - 60);
+
+      // Points
+      rctx.fillStyle = 'rgba(108,240,255,0.9)';
+      data.forEach(p=>{
+        rctx.beginPath();
+        rctx.arc(sx(p.x), sy(p.y), 3, 0, Math.PI*2);
+        rctx.fill();
+      });
+
+      // True line
+      rctx.strokeStyle = 'rgba(255,157,108,0.7)';
+      rctx.lineWidth = 2;
+      rctx.beginPath();
+      rctx.moveTo(sx(-3), sy(trueW * -3 + trueB));
+      rctx.lineTo(sx(3), sy(trueW * 3 + trueB));
+      rctx.stroke();
+
+      // Model line
+      rctx.strokeStyle = 'rgba(80,211,125,0.9)';
+      rctx.lineWidth = 2.5;
+      rctx.beginPath();
+      rctx.moveTo(sx(-3), sy(w * -3 + b));
+      rctx.lineTo(sx(3), sy(w * 3 + b));
+      rctx.stroke();
+
+      // Loss
+      let mse = 0;
+      for(const p of data){
+        const yhat = w*p.x + b;
+        const e = yhat - p.y;
+        mse += e*e;
+      }
+      mse /= data.length;
+
+      rctx.fillStyle = '#b8c0dd';
+      rctx.font = '14px ui-monospace';
+      rctx.fillText(`w=${w.toFixed(3)}  b=${b.toFixed(3)}  MSE=${mse.toFixed(3)}  lr=${parseFloat(lrEl.value).toFixed(3)}`, 50, 26);
+    }
+
+    function stepGD(iter=50){
+      const lr = parseFloat(lrEl.value);
+      for(let k=0;k<iter;k++){
+        let dw = 0, db = 0;
+        for(const p of data){
+          const yhat = w*p.x + b;
+          const e = yhat - p.y;
+          dw += 2 * e * p.x;
+          db += 2 * e;
+        }
+        dw /= data.length;
+        db /= data.length;
+        w -= lr * dw;
+        b -= lr * db;
+      }
+      drawReg();
+    }
+
+    regenBtn.addEventListener('click', ()=>{
+      genData(); drawReg();
+    });
+
+    stepBtn.addEventListener('click', ()=>{
+      stepGD(50);
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      w = rand(-1,1); b = rand(-0.5,0.5);
+      drawReg();
+    });
+
+    lrEl.addEventListener('input', drawReg);
+    noiseEl.addEventListener('input', ()=>{
+      genData(); drawReg();
+    });
+
+    // --- Classifier Demo ---
+    const clsCanvas = document.getElementById('clsCanvas');
+    const cctx = clsCanvas.getContext('2d');
+    const angleEl = document.getElementById('angle');
+
+    let clsA = [], clsB = [];
+    function genClusters(){
+      clsA = []; clsB = [];
+      for(let i=0;i<120;i++){
+        clsA.push({x: rand(0.15, 0.45), y: rand(0.55, 0.85)});
+        clsB.push({x: rand(0.55, 0.85), y: rand(0.15, 0.45)});
+      }
+    }
+
+    function drawClassifier(){
+      cctx.clearRect(0,0,clsCanvas.width, clsCanvas.height);
+      const w = clsCanvas.width, h = clsCanvas.height;
+
+      const sx = x => x * (w-40) + 20;
+      const sy = y => (1-y) * (h-40) + 20;
+
+      // axes box
+      cctx.strokeStyle = '#2b3b8a'; cctx.lineWidth = 1;
+      cctx.strokeRect(20,20,w-40,h-40);
+
+      // points
+      cctx.fillStyle = 'rgba(108,240,255,0.9)';
+      clsA.forEach(p=>{ cctx.beginPath(); cctx.arc(sx(p.x), sy(p.y), 3, 0, Math.PI*2); cctx.fill(); });
+      cctx.fillStyle = 'rgba(255,157,108,0.9)';
+      clsB.forEach(p=>{ cctx.beginPath(); cctx.arc(sx(p.x), sy(p.y), 3, 0, Math.PI*2); cctx.fill(); });
+
+      // decision boundary
+      const ang = parseFloat(angleEl.value) * Math.PI/180;
+      const cx = 0.5, cy = 0.5;
+      const nx = Math.cos(ang), ny = Math.sin(ang); // normal vector
+      // line through center with normal (nx, ny): draw segment across box
+      cctx.strokeStyle = 'rgba(80,211,125,0.9)'; cctx.lineWidth = 2;
+      cctx.beginPath();
+      // compute two far points along direction perpendicular to normal
+      const dx = -ny, dy = nx;
+      const p1x = cx - 2*dx, p1y = cy - 2*dy;
+      const p2x = cx + 2*dx, p2y = cy + 2*dy;
+      cctx.moveTo(sx(p1x), sy(p1y));
+      cctx.lineTo(sx(p2x), sy(p2y));
+      cctx.stroke();
+
+      // classification shading (optional simple scores)
+      const score = (x,y) => nx*(x-cx) + ny*(y-cy);
+      let correct = 0, total = clsA.length + clsB.length;
+      clsA.forEach(p => { if(score(p.x,p.y) < 0) correct++; });
+      clsB.forEach(p => { if(score(p.x,p.y) > 0) correct++; });
+
+      const acc = correct/total;
+      cctx.fillStyle = '#b8c0dd';
+      cctx.font = '14px ui-monospace';
+      cctx.fillText(`angle=${parseFloat(angleEl.value)}°  accuracy=${(acc*100).toFixed(1)}%`, 30, 36);
+    }
+
+    angleEl.addEventListener('input', drawClassifier);
+
+    // --- Quiz ---
+    const correctAnswers = { 1: 'A', 2: 'A', 3: 'A' };
+    const options = document.querySelectorAll('.option');
+    const submitQuiz = document.getElementById('submitQuiz');
+    const quizResult = document.getElementById('quizResult');
+
+    options.forEach(opt=>{
+      opt.addEventListener('click', ()=>{
+        const group = opt.getAttribute('data-q');
+        // Unselect group
+        document.querySelectorAll(`.option[data-q="${group}"]`).forEach(o=>{
+          o.classList.remove('correct','wrong');
+          o.setAttribute('aria-checked','false');
+        });
+        opt.setAttribute('aria-checked','true');
+        opt.classList.add('selected');
+      });
+    });
+
+    submitQuiz.addEventListener('click', ()=>{
+      let score = 0;
+      const chosen = {};
+      document.querySelectorAll('.option[aria-checked="true"]').forEach(o=>{
+        const q = o.getAttribute('data-q');
+        const a = o.getAttribute('data-a');
+        chosen[q] = a;
+      });
+
+      // clear visuals
+      document.querySelectorAll('.option').forEach(o=>{
+        o.classList.remove('correct','wrong');
+      });
+
+      [1,2,3].forEach(q=>{
+        const opts = document.querySelectorAll(`.option[data-q="${q}"]`);
+        opts.forEach(o=>{
+          const a = o.getAttribute('data-a');
+          if(a === correctAnswers[q]){
+            o.classList.add('correct');
+          }else if(chosen[q] === a){
+            o.classList.add('wrong');
+          }
+        });
+        if(chosen[q] === correctAnswers[q]) score++;
+      });
+
+      quizResult.textContent = `Score: ${score}/3 — ${score===3 ? 'Great job!' : score===2 ? 'Solid start.' : 'Keep exploring; you’ve got this.'}`;
+    });
+
+    // --- Initialize ---
+    function init(){
+      genData(); drawReg();
+      genClusters(); drawClassifier();
+    }
+    init();
+  </script>
+</body>
+</html>
